@@ -1,43 +1,30 @@
 import Foundation
 import RequestResponse
 
-//TODO: описание API тут https://docs.itvgroup.ru/confluence/spaces/next46ru/pages/198799208/Статистика+видеокамер нужно проверить передаваемые параметры на валидность или подправить до требуемого состояния и описать в /// в методе что нужно передавать.
+private let hostsPrefix = "hosts/"
 
-/// API for retrieving stream statistics (Axxon Next).
+/// API for retrieving stream statistics (`/statistics`).
 public enum StatisticsApi {
-    /// Request for a single stream's statistics.
-    public typealias StreamRequest = Request<StreamStatisticResponse>
-    
-    /// Creates a request to fetch statistics for a single stream.
-    /// - Parameters:
-    ///   - id: AccessPoint in `hosts/...` format
-    /// - Returns: Request to fetch stream statistics
-    public static func statistics(for id: AccessPoint) -> Request<StreamStatisticResponse> {
-        precondition(!id.starts(with: "hosts"), "AccessPoint must not start with 'hosts/")
-        return Request(path: "statistics/\(id)", method: .get)
+    /// Endpoint: `GET /statistics/{accessPoint}` — legacy VMS.
+    ///
+    /// The path must not include the `hosts/` prefix; it is stripped automatically when present.
+    public static func statistics(for id: AccessPoint) -> Request<StreamStatistics> {
+        let pathID = id.hasPrefix(hostsPrefix) ? String(id.dropFirst(hostsPrefix.count)) : id
+        return Request(path: "statistics/\(pathID)", method: .get)
     }
-    
-    /// Creates a request to fetch statistics for a single stream.
-    /// - Parameters:
-    ///   - id: AccessPoint in `hosts/...` format
-    /// - Returns: Request to fetch stream statistics
+
+    /// Endpoint: `POST /statistics` — recommended batch request.
+    ///
+    /// Body: JSON array of access points. The `hosts/` prefix is added automatically when missing.
+    /// Accepts at most ~200 access points per request; split larger lists on the client side.
     public static func statistics(for ids: [AccessPoint]) -> Request<StreamStatisticResponse> {
-        precondition(ids.allSatisfy({ $0.starts(with: "hosts") }), "AccessPoint's in ids must start with 'hosts/")
-        let body = try? JSONEncoder().encode(ids)
-        return Request(path: "/statistics", method: .post, body: body)
-        /* response
-         {
-         "hosts/DEMOSERVER/DeviceIpint.1/SourceEndpoint.video:0:0" : {
-         "bitrate" : 1085025,
-         "fps" : 19.899177551269531,
-         "height" : 720,
-         "mediaType" : 2,
-         "streamType" : 875967048,
-         "width" : 1280
-         },
-         ...
-         }
-         */
+        precondition(ids.count <= 200, "POST /statistics accepts at most 200 access points per request")
+        let normalizedIDs = ids.map { id in
+            id.hasPrefix(hostsPrefix) ? id : hostsPrefix + id
+        }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .withoutEscapingSlashes
+        let body = try? encoder.encode(normalizedIDs)
+        return Request(path: "statistics", method: .post, body: body)
     }
 }
-
