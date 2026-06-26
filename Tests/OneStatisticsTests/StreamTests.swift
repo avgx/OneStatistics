@@ -46,7 +46,7 @@ import CCTVThings
     #expect(stream.resolution != .fourCifPal)
     #expect(stream.mediaType.value == .video)
     #expect(stream.streamType == .h264)
-    #expect(stream.description == "H264 768x576 \(stream.fps)f/s \(stream.bitrateMbps)Mb/s")
+    #expect(stream.description == "H264 768x576 25.0f/s 9.11Mb/s")
 }
 
 @Test func decodeDualStreamPostResponse() throws {

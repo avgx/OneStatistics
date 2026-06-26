@@ -36,6 +36,11 @@ public struct StreamStatistics: Codable, Equatable, Sendable {
 
 extension StreamStatistics: CustomStringConvertible {
     public var description: String {
-        "\(fourCC) \(resolution) \(fps)f/s \(bitrateMbps)Mb/s"
+        let style = FloatingPointFormatStyle<Double>.number
+            .locale(Locale(identifier: "en_US_POSIX"))
+            .precision(.significantDigits(3))
+        let bitrateFixed = bitrateMbps.formatted(style)
+        let fpsFixed = fps.formatted(style)
+        return "\(fourCC) \(resolution) \(fpsFixed)f/s \(bitrateFixed)Mb/s"
     }
 }
