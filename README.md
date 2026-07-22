@@ -1,6 +1,6 @@
 # OneStatistics
 
-Swift package for the **stream statistics** API (`/statistics`).
+Swift package for VMS **statistics** APIs (`/statistics`, `/statistics/webserver`).
 
 **Platforms:** iOS 15+, macOS 13+, tvOS 18+, watchOS 9+, visionOS 1+  
 **Swift tools:** 6.1+
@@ -18,7 +18,8 @@ Swift package for the **stream statistics** API (`/statistics`).
 ```
 Sources/OneStatistics/
 ├── API/           StatisticsApi, AccessPoint
-└── Stream/        StreamStatistics, StreamStatisticResponse, MediaType
+├── Stream/        StreamStatistics, StreamStatisticResponse, MediaType
+└── Webserver/     WebserverStatistics
 ```
 
 ## API
@@ -27,6 +28,7 @@ Sources/OneStatistics/
 |--------|------|----------|
 | `StatisticsApi.statistics(for id:)` | `GET /statistics/{accessPoint}` | `StreamStatistics` |
 | `StatisticsApi.statistics(for ids:)` | `POST /statistics` | `StreamStatisticResponse` |
+| `StatisticsApi.webserver()` | `GET /statistics/webserver` | `WebserverStatistics` |
 
 - **GET (legacy):** `hosts/` prefix is stripped from the path automatically.
 - **POST (recommended):** `hosts/` prefix is added to each access point when missing.

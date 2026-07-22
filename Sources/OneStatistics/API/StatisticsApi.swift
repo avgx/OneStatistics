@@ -3,7 +3,7 @@ import RequestResponse
 
 private let hostsPrefix = "hosts/"
 
-/// API for retrieving stream statistics (`/statistics`).
+/// API for retrieving stream and webserver statistics (`/statistics`).
 public enum StatisticsApi {
     /// Endpoint: `GET /statistics/{accessPoint}` — legacy VMS.
     ///
@@ -27,4 +27,10 @@ public enum StatisticsApi {
         let body = try? encoder.encode(normalizedIDs)
         return Request(path: "statistics", method: .post, body: body)
     }
+
+    /// Endpoint: `GET /statistics/webserver` — VMS webserver process metrics (Next / One).
+    public static func webserver() -> Request<WebserverStatistics> {
+        Request(path: "statistics/webserver", method: .get)
+    }
 }
+
